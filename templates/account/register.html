@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% load forms %}
+{% block main_content %}
+    <main class="form-register w-100 mt-5 m-auto">
+        <form action="{% url 'user_register' %}" method="post">
+            <h1 class="h3 mb-3 fw-normal">Register an account</h1>
+            {{ form.username.errors }}
+            <div class="form-floating">
+                {{ form.username|placeholder:'Username'|form_field_class:'form-control' }}
+                {{ form.username.label_tag }}
+                {{ form.username.help_text }}
+            </div>
+            {{ form.email.errors }}
+            <div class="form-floating">
+                {{ form.email|placeholder:'Email'|form_field_class:'form-control' }}
+                {{ form.email.label_tag }}
+                {{ form.email.help_text }}
+            </div>
+            {{ form.password1.errors }}
+            {{ form.password2.errors }}
+            <div class="form-floating">
+                {{ form.password1|placeholder:'Password'|form_field_class:'form-control' }}
+                {{ form.password1.label_tag }}
+            </div>
+            <div class="form-floating">
+                {{ form.password2|placeholder:'Repeat password'|form_field_class:'form-control' }}
+                {{ form.password2.label_tag }}
+            </div>
+            <div class="help-text">
+                {{ form.password1.help_text }}
+            </div>
+            <div class="form-floating">
+                {{ form.consent }}
+                I agree with <a href="#">terms and conditions</a>.
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+            {% csrf_token %}
+        </form>
+    </main>
+    {#    ##################################################################}
+
+
+    {#    <main class="form-register w-100 mt-5 m-auto">#}
+    {#        <form data-bitwarden-watching="1" action="{% url 'user_register' %}" method="post">#}
+    {#            <h1 class="h3 mb-3 fw-normal">Please fill the form to register an account</h1>#}
+    {#            <div class="form-floating">#}
+    {#                {{ form.username.errors }}#}
+    {#                {{ form.username|placeholder:'Username'|form_field_class:'form-control' }}#}
+    {#                {{ form.username.help_text }}#}
+    {#                <label for="floatingInput">Username</label>#}
+    {#            </div>#}
+    {#            <div class="form-floating">#}
+    {#                {{ form.username.errors }}#}
+    {#                {{ form.email|placeholder:'Password'|form_field_class:'form-control' }}#}
+    {#                {{ form.username.help_text }}#}
+    {#                <label for="floatingPassword">Your email</label>#}
+    {#            </div>#}
+    {#            <div class="form-floating">#}
+    {#                {{ form.username.errors }}#}
+    {#                {{ form.password1|placeholder:'Password'|form_field_class:'form-control' }}#}
+    {#                {{ form.username.help_text }}#}
+    {#                <label for="floatingPassword">Password</label>#}
+    {#            </div>#}
+    {#            <div class="form-floating">#}
+    {#                {{ form.username.errors }}#}
+    {#                {{ form.password2|placeholder:'Password'|form_field_class:'form-control' }}#}
+    {#                {{ form.username.help_text }}#}
+    {#                <label for="floatingPassword">Repeat password</label>#}
+    {#            </div>#}
+    {#            <div class="checkbox mb-3">#}
+    {#                <label>#}
+    {#                    {{ form.consent }} I agree#}
+    {#                </label>#}
+    {#            </div>#}
+    {#            <button class="btn btn-primary w-100 py-2" type="submit">Register</button>#}
+    {#            {% csrf_token %}#}
+    {#        </form>#}
+    {#    </main>#}
+
+{% endblock %}

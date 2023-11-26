@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+{% load forms %}
+{% block main_content %}
+
+    <main class="form-signin w-100 mt-5 m-auto">
+        <form data-bitwarden-watching="1" action="{% url 'user_login' %}" method="post">
+            <h1 class="h3 mb-3 fw-normal">Please Log In</h1>
+            <div class="form-floating">
+                {{ form.username.errors }}
+                {{ form.username|placeholder:'Username'|form_field_class:'form-control' }}
+                <label for="floatingInput">Username</label>
+            </div>
+            <div class="form-floating">
+                {{ form.password.errors }}
+                {{ form.password|placeholder:'Password'|form_field_class:'form-control' }}
+                <label for="floatingPassword">Password</label>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Log In</button>
+            {% csrf_token %}
+        </form>
+    </main>
+
+{% endblock %}
