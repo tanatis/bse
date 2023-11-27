@@ -1,6 +1,8 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth import views as auth_views
@@ -23,19 +25,19 @@ def index(request):
 
 
 def activate(request, uidb64, token):
-    User = get_user_model()
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
+        user = UserModel.objects.get(pk=uid)
     except:
         user = None
 
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
+        login(request, user)
 
-        messages.success(request, "Thank you for your email confirmation. Now you can login your account.")
-        return redirect('user_login')
+        messages.success(request, f"Thank you for your email confirmation. You are now logged in as {user.username}. \n Please update your profile-pictures.")
+        return redirect('index')
     else:
         messages.error(request, "Activation link is invalid!")
 
@@ -53,7 +55,8 @@ def activate_email(request, user, to_email):
     })
     email = EmailMessage(mail_subject, message, to=[to_email])
     if email.send():
-        messages.warning(request, f"Dear {user}, please activate your account by clicking the link we've just sent you to {to_email}")
+        messages.warning(request,
+                         f"Dear {user}, please activate your account by clicking the link we've just sent you to {to_email}")
     else:
         messages.error(request, f"Problem sending mail to {to_email}")
 
@@ -97,3 +100,48 @@ class UserLogoutView(auth_views.LogoutView):
 class UserListView(views.ListView):
     model = UserModel
     template_name = 'account/accounts.html'
+
+
+class ProfileDetailsView(LoginRequiredMixin, views.DetailView):
+    login_url = 'user_login'
+    model = Profile
+    template_name = 'account/profile-details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['pk'] = self.object.pk
+
+        return context
+
+
+class ProfileEditView(views.UpdateView):
+    model = Profile
+    template_name = 'account/profile-edit.html'
+    fields = ['first_name', 'last_name', 'city', 'profile_picture']
+
+    def get_success_url(self):
+        return reverse_lazy('profile_details', kwargs={'pk': self.object.pk})
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.error(request, 'You must be logged in to edit profile!')
+            return redirect('user_login')
+        profile = self.get_object()
+        if self.request.user != profile.user:
+            messages.error(request, 'You can only edit your own profile')
+            return redirect('profile_edit', pk=request.user.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ProfileDeleteView(UserPassesTestMixin, LoginRequiredMixin, views.DeleteView):
+    login_url = 'user_login'
+    success_url = reverse_lazy('index')
+    template_name = 'account/profile-delete.html'
+    model = UserModel
+
+    def test_func(self):
+        return self.get_object().pk == self.request.user.pk or self.request.user.is_superuser
+
+    def handle_no_permission(self):
+        raise Http404()
+    

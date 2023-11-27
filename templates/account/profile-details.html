@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block main_content %}
+<div>
+<ul>
+    {% if object.profile_picture %}
+        <img src="/media/{{ object.profile_picture }}" alt="">
+    {% else %}
+        <img src="{% static 'profile-pictures/default.jpg' %}" alt="">
+    {% endif %}
+    <li>Name: {{ object.get_full_name }}</li>
+    <li>City: {% if object.city %}{{ object.city }}{% endif %}</li>
+</ul>
+</div>
+{% endblock %}

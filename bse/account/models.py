@@ -17,4 +17,11 @@ class BseUser(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
 class Profile(models.Model):
     first_name = models.CharField(blank=True, null=True, max_length=30,)
     last_name = models.CharField(blank=True, null=True, max_length=30,)
+    city = models.CharField(blank=True, null=True, max_length=50,)
+    profile_picture = models.ImageField(upload_to='profiles', null=True, blank=True,)
     user = models.OneToOneField(BseUser, on_delete=models.CASCADE, primary_key=True,)
+
+    def get_full_name(self):
+        if self.first_name and self.last_name:
+            return f'{self.first_name} {self.last_name}'
+        return self.user.username
