@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'bse.account',
+    'bse.tickers',
 ]
 
 MIDDLEWARE = [

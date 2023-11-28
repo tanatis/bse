@@ -1,0 +1,8 @@
+{% extends 'base/base.html' %}
+{% block main_content %}
+<div>
+{% for t in object_list %}
+    <p>{{ t.symbol }} - {{ t.company_name }}: <strong>{{ t.current_price }}</strong> | <a href="{% url 'check_price' symbol=t.symbol %}">check</a></p>
+{% endfor %}
+</div>
+{% endblock %}
