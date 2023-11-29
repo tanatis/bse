@@ -5,4 +5,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('bse.account.urls')),
     path('', include('bse.tickers.urls')),
+    path('', include('bse.portfolio.urls')),
+    path('', include('bse.core.urls')),
 ]

@@ -1,0 +1,9 @@
+{% extends 'base/base.html' %}
+{% block main_content %}
+    <div>
+        <p>Portfolio: <strong>{{ portfolio.name }}</strong></p>
+        <p>Cash: <strong>{{ portfolio.cash }}</strong></p>
+        <p>Created: <strong>{{ portfolio.create_date }}</strong></p>
+        <p><a href="{% url 'portfolio_delete' pk=portfolio.pk %}">Delete this portfolio</a></p>
+    </div>
+{% endblock %}

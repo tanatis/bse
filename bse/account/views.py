@@ -20,10 +20,6 @@ from bse.utils.tokens import account_activation_token
 UserModel = get_user_model()
 
 
-def index(request):
-    return render(request, 'index.html')
-
-
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))

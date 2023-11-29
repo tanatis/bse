@@ -44,16 +44,30 @@
                         <button type="button" class="btn btn-warning">Sign-up</button>
                     </a>
                 {% else %}
+
                     <div class="dropdown">
                         <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            My Profile
+                            Portfolio
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            <li><a class="dropdown-item" href="{% url 'portfolio_create' %}">Create new</a></li>
+                            {% for p in request.user.portfolio_set.all %}
+                            <li><a class="dropdown-item" href="{% url 'portfolio_details' pk=p.pk %}">{{ p.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ request.user.username }}
                         </a>
 
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             <li><a class="dropdown-item" href="{% url 'profile_details' pk=request.user.pk %}">View</a></li>
                             <li><a class="dropdown-item" href="{% url 'profile_edit' pk=request.user.pk %}">Edit</a></li>
-                            <li><a class="dropdown-item" href="#">Delete</a></li>
+                            <li><a class="dropdown-item" href="{% url 'profile_delete' pk=request.user.pk %}">Delete</a></li>
                         </ul>
                     </div>
 {#                    <a href="{% url 'profile_details' pk=request.user.pk %}">{{ request.user }}</a>#}

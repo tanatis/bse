@@ -1,0 +1,11 @@
+{% extends 'base/base.html' %}
+{% block main_content %}
+    <div>
+        <form action="{% url 'portfolio_create' %}" method="post">
+            {{ form.as_p }}
+            <button>Create portfolio</button>
+            {% csrf_token %}
+        </form>
+
+    </div>
+{% endblock %}
