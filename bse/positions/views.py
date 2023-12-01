@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 
 from bse.portfolio.models import Portfolio
@@ -24,9 +25,10 @@ class CreatePositionForm(forms.ModelForm):
             self.fields['to_portfolio'].queryset = Portfolio.objects.filter(user=user)
 
 
-@login_required
-def create_position(request, pk):
-    ticker = get_object_or_404(Ticker, pk=pk)
+@login_required(login_url='user_login')
+def create_position(request, symbol):
+
+    ticker = get_object_or_404(Ticker, symbol=symbol)
     portfolio = Portfolio.objects.filter(user=request.user)
 
     if not portfolio:
@@ -40,17 +42,29 @@ def create_position(request, pk):
             price = form.cleaned_data['price']
             portfolio_id = form.cleaned_data['to_portfolio'].id
             portfolio = Portfolio.objects.get(pk=portfolio_id)
+            if portfolio.cash < count * price:
+                messages.error(request, 'no cash')
+                return redirect(request.META['HTTP_REFERER'])
 
-            # Create a new position
-            position = Position(
-                ticker=ticker,
-                count=count,
-                price=price * count,
-                to_portfolio_id=portfolio_id,
-                avg_price=price,
-            )
-            position.save()
+            existing_position = Position.objects.filter(ticker=ticker, to_portfolio_id=portfolio_id).first()
 
+            if existing_position:
+                existing_position.count += count
+                existing_position.price += count * price
+                existing_position.avg_price = existing_position.price / existing_position.count
+                existing_position.save()
+            else:
+                # Create a new position
+                position = Position(
+                    ticker=ticker,
+                    count=count,
+                    price=price * count,
+                    to_portfolio_id=portfolio_id,
+                    avg_price=price,
+                )
+                position.save()
+            portfolio.cash -= count * price
+            portfolio.save()
             return redirect('portfolio_details', pk=portfolio.pk)
 
     else:

@@ -13,3 +13,14 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CashOperations(models.Model):
+    OPERATIONS = (
+        ('deposit', 'Deposit'),
+        ('withdraw', 'Withdraw'),
+    )
+    operation = models.CharField(choices=OPERATIONS, max_length=8, blank=False, null=False)
+    amount = models.FloatField(blank=False, null=False, validators=[MinValueValidator(0.01, message='Must be greater than 0!')])
+    portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE)
+    date_added = models.DateField(auto_now_add=True)

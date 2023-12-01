@@ -1,7 +1,8 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.http import Http404
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from django.views.generic import DetailView, CreateView, DeleteView
 
 from bse.portfolio.models import Portfolio
@@ -70,3 +71,22 @@ class PortfolioDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def handle_no_permission(self):
         raise Http404
+
+
+def cash_operations(request, pk):
+    portfolio = Portfolio.objects.filter(pk=pk, user_id=request.user.id).get()
+
+    if request.method == 'POST':
+        operation = request.POST.get('operation')
+        amount = float(request.POST.get('amount'))
+
+        if operation == 'deposit':
+            portfolio.cash += amount
+        elif operation == 'withdraw':
+            if amount > portfolio.cash:
+                messages.error(request, f'Insufficient cash')
+                return redirect(request.META['HTTP_REFERER'])
+            portfolio.cash -= amount
+
+        portfolio.save()
+    return HttpResponseRedirect(reverse('portfolio_details', args=[pk]))

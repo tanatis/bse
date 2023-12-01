@@ -10,8 +10,8 @@
         </form>
     </div>
     <div>
-    {% for result in search_result %}
-        <p>{{ result.pk }}) {{ result.symbol }} | <a href="{% url 'position_create' pk=result.pk %}">create position</a></p>
+    {% for ticker in search_result %}
+        <p>{{ ticker.pk }}) {{ ticker.symbol }} | <a href="{% url 'position_create' symbol=ticker.symbol %}">create position</a></p>
     {% endfor %}
     </div>
 {% endblock %}

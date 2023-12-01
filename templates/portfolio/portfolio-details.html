@@ -6,9 +6,26 @@
         <p>Created: <strong>{{ portfolio.create_date }}</strong></p>
 
             {% for position in positions %}
-                <p>{{ position.ticker.symbol }}: {{ position.count }} X {{ position.price }}</p>
+                <p>{{ position.ticker.symbol }}: {{ position.count }} - {{ position.avg_price }}</p>
             {% endfor %}
-
-        <p><a href="{% url 'portfolio_delete' pk=portfolio.pk %}">Delete this portfolio</a></p>
+    </div>
+    <div>
+        <form action="{% url 'portfolio_cash' pk=portfolio.pk %}" method="post">
+            <label for="operation">Operation:</label>
+                <select name="operation" id="operation">
+                    <option value="">Choose:</option>
+                    <option value="deposit">Deposit</option>
+                    <option value="withdraw">Withdraw</option>
+                </select>
+            <label for="amount">Amount:</label>
+            <input type="number" step="0.01" name="amount">
+            <button>Submit</button>
+            {% csrf_token %}
+        </form>
+    </div>
+    <div>
+        <p>
+            <a href="{% url 'portfolio_delete' pk=portfolio.pk %}">Delete this portfolio</a>
+        </p>
     </div>
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends 'base/base.html' %}
 {% block main_content %}
 <div>
-    <form action="{% url 'position_create' pk=ticker.pk %}" method="post">
+    {{ ticker.company_name }}
+    <form action="{% url 'position_create' symbol=ticker.symbol %}" method="post">
         {{ form }}
         <button>Add position</button>
         {% csrf_token %}
