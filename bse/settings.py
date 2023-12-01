@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'bse.tickers',
     'bse.portfolio',
     'bse.core',
+    'bse.positions',
 ]
 
 MIDDLEWARE = [

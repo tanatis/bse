@@ -7,4 +7,5 @@ urlpatterns = [
     path('', include('bse.tickers.urls')),
     path('', include('bse.portfolio.urls')),
     path('', include('bse.core.urls')),
+    path('', include('bse.positions.urls')),
 ]

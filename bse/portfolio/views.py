@@ -5,11 +5,18 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView, CreateView, DeleteView
 
 from bse.portfolio.models import Portfolio
+from bse.positions.models import Position
 
 
 class PortfolioDetailsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Portfolio
     template_name = 'portfolio/portfolio-details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        positions = Position.objects.filter(to_portfolio_id=self.object.pk)
+        context['positions'] = positions
+        return context
 
     def test_func(self):
         portfolio = self.get_object()

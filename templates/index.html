@@ -2,4 +2,16 @@
 {% block main_content %}
 
     <h1>You are: {{ request.user }}</h1>
+    <div>
+        <form action="{% url 'index' %}" method="get">
+            {{ form }}
+            <button>Search</button>
+            {% csrf_token %}
+        </form>
+    </div>
+    <div>
+    {% for result in search_result %}
+        <p>{{ result.pk }}) {{ result.symbol }} | <a href="{% url 'position_create' pk=result.pk %}">create position</a></p>
+    {% endfor %}
+    </div>
 {% endblock %}
