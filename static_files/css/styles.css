@@ -1,0 +1,8 @@
+.form-signin,
+.form-register {
+    max-width: 300px;
+}
+
+.form-floating {
+    margin-bottom: 1rem;
+}

@@ -80,12 +80,13 @@ def cash_operations(request, pk):
         operation = request.POST.get('operation')
         amount = float(request.POST.get('amount'))
 
+        if amount > portfolio.cash or amount <= 0:
+            messages.error(request, f'Error! Please fix the amount and try again!')
+            return redirect(request.META['HTTP_REFERER'])
+
         if operation == 'deposit':
             portfolio.cash += amount
         elif operation == 'withdraw':
-            if amount > portfolio.cash:
-                messages.error(request, f'Insufficient cash')
-                return redirect(request.META['HTTP_REFERER'])
             portfolio.cash -= amount
 
         portfolio.save()

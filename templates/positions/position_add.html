@@ -1,0 +1,10 @@
+{% extends 'base/base.html' %}
+{% block main_content %}
+<div>
+    <form action="{% url 'position_add' pk=position.id %}" method="post">
+        {{ form.as_p }}
+        <button>Buy {{ position.ticker.symbol }}</button>
+        {% csrf_token %}
+    </form>
+</div>
+{% endblock %}

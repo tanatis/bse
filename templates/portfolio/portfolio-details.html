@@ -1,22 +1,77 @@
 {% extends 'base/base.html' %}
 {% block main_content %}
-    <div>
-        <p>Portfolio: <strong>{{ portfolio.name }}</strong></p>
-        <p>Cash: <strong>{{ portfolio.cash }}</strong></p>
-        <p>Created: <strong>{{ portfolio.create_date }}</strong></p>
-
-            {% for position in positions %}
-                <p>{{ position.ticker.symbol }}: {{ position.count }} - {{ position.avg_price }}</p>
-            {% endfor %}
+    {#    <div>#}
+    {#        <p>Portfolio: <strong>{{ portfolio.name }}</strong></p>#}
+    {#        <p>Cash: <strong>{{ portfolio.cash }}</strong></p>#}
+    {#        <p>Created: <strong>{{ portfolio.create_date }}</strong></p>#}
+    {##}
+    {#        {% for position in positions %}#}
+    {#            <p>{{ position.ticker.symbol }}: {{ position.count }} - {{ position.avg_price }}#}
+    {#                | <a href="{% url 'position_add' pk=position.id %}">Buy shares</a>#}
+    {#                | <a href="{% url 'position_sell' pk=position.id %}">Sell shares</a></p>#}
+    {#        {% endfor %}#}
+    {#    </div>#}
+    <div class="w-75 mx-auto">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Код</th>
+                    <th scope="col">Брой</th>
+                    <th scope="col">Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for position in positions %}
+                    <tr>
+                        <th scope="row">#</th>
+                        <td>{{ position.ticker.symbol }}</td>
+                        <td>{{ position.count }}</td>
+                        <td>{{ position.avg_price }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <th scope="row"></th>
+                    <td colspan="2"></td>
+                    <td>LINKS</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+    <hr>
+    <div id="portfolio-container" class="portfolio accordion">
+        <div class="portfolio-header">
+            <div class="portfolio-cell">Ticker</div>
+            <div class="portfolio-cell">shares count</div>
+            <div class="portfolio-cell">price per share</div>
+            <div class="portfolio-cell">total invested</div>
+            <div class="portfolio-cell">current price</div>
+            <div class="portfolio-cell">change</div>
+            <div class="portfolio-cell">gain / loss</div>
+            <div class="portfolio-cell"></div>
+        </div>
+        <div id="loader">
+            <div class="loader">
+                <div class="justify-content-center jimu-primary-loading"></div>
+            </div>
+        </div>
+    </div>
+    <div class="portfolio-bottom">
+        <a class="action action-delete" href="">Delete portfolio</a>
+        <a id="toggle-link" class="action action-cash">Cash operations</a>
+
+    </div>
+    <hr>
     <div>
         <form action="{% url 'portfolio_cash' pk=portfolio.pk %}" method="post">
             <label for="operation">Operation:</label>
-                <select name="operation" id="operation">
-                    <option value="">Choose:</option>
-                    <option value="deposit">Deposit</option>
-                    <option value="withdraw">Withdraw</option>
-                </select>
+            <select name="operation" id="operation">
+                <option value="">Choose:</option>
+                <option value="deposit">Deposit</option>
+                <option value="withdraw">Withdraw</option>
+            </select>
             <label for="amount">Amount:</label>
             <input type="number" step="0.01" name="amount">
             <button>Submit</button>

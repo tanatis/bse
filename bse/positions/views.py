@@ -1,10 +1,11 @@
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 
 from bse.portfolio.models import Portfolio
+from bse.positions.forms import AddSellPositionForm
 from bse.positions.models import Position
 from bse.tickers.models import Ticker
 
@@ -23,6 +24,10 @@ class CreatePositionForm(forms.ModelForm):
         if user:
             self.user = user
             self.fields['to_portfolio'].queryset = Portfolio.objects.filter(user=user)
+
+
+def is_portfolio_user(user, portfolio):
+    return user == portfolio.user
 
 
 @login_required(login_url='user_login')
@@ -76,3 +81,77 @@ def create_position(request, symbol):
     }
 
     return render(request, 'positions/position-create.html', context)
+
+
+@login_required(login_url='user_login')
+def add_to_position(request, pk):
+    position = Position.objects.filter(pk=pk).get()
+    portfolio = Portfolio.objects.filter(pk=position.to_portfolio_id).get()
+    if portfolio.user != request.user:
+        raise Http404()
+
+    if request.method == 'GET':
+        form = AddSellPositionForm()
+    else:
+        form = AddSellPositionForm(request.POST)
+        if form.is_valid():
+            price_per_share = form.cleaned_data['price']
+            count = form.cleaned_data['count']
+            if count * price_per_share > portfolio.cash:
+                messages.error(request, "Not enough cash to complete the operation")
+                return redirect('portfolio_details', pk=portfolio.pk)
+
+            position.count += count
+            position.price += count * price_per_share
+            position.avg_price = position.price / position.count
+            position.save()
+
+            portfolio.cash -= count * price_per_share
+            portfolio.save()
+
+            return redirect('portfolio_details', pk=portfolio.pk)
+
+    context = {
+        'form': form,
+        'position': position,
+        'portfolio': portfolio,
+    }
+    return render(request, 'positions/position_add.html', context)
+
+
+@login_required(login_url='user_login')
+def sell_position(request, pk):
+    position = Position.objects.get(pk=pk)
+    portfolio = Portfolio.objects.filter(pk=position.to_portfolio_id).get()
+
+    if portfolio.user != request.user:
+        raise Http404()
+
+    if request.method == 'GET':
+        form = AddSellPositionForm()
+    else:
+        form = AddSellPositionForm(request.POST)
+        if form.is_valid():
+            count = form.cleaned_data['count']
+            price_per_share = form.cleaned_data['price']
+            if count > position.count:
+                messages.error(request, f"You cannot sell more than {position.count} shares")
+                return redirect('portfolio_details', pk=portfolio.pk)
+            elif count == position.count:
+                position.delete()
+            else:
+                position.count -= count
+                position.price -= count * position.avg_price
+                position.save()
+
+            portfolio.cash += count * price_per_share
+            portfolio.save()
+
+            return redirect('portfolio_details', pk=portfolio.pk)
+
+    context = {
+        'form': form,
+        'position': position,
+        'portfolio': portfolio,
+    }
+    return render(request, 'positions/position_sell.html', context)
