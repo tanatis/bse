@@ -1,8 +1,12 @@
 .form-signin,
-.form-register {
-    max-width: 300px;
-}
+.form-register {max-width: 300px;}
+.form-floating {margin-bottom: 1rem;}
 
-.form-floating {
-    margin-bottom: 1rem;
-}
+.portfolio {display: flex; flex-direction: column; width: 80%; margin:0 auto;}
+.portfolio-header {background-color: #076fe5; color: #e1ecf4;}
+.portfolio-header,
+.portfolio-row {display: flex; border-bottom: 1px solid #d4e6f2; padding: 1rem 0;}
+.portfolio-row:hover {background-color: #d4e6f2;}
+.portfolio-cell {width: 150px; text-align: center;}
+.portfolio-cell a {text-decoration: none; color: #076fe5;}
+.portfolio-bottom {width: 80%; margin: 0 auto; display: flex; justify-content: end; gap: 2rem; padding: 1rem 5rem 0 0;}

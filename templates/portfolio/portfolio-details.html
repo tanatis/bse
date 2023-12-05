@@ -12,6 +12,7 @@
     {#        {% endfor %}#}
     {#    </div>#}
     <div class="w-75 mx-auto">
+        <div>{{ portfolio.name }}: ${{ portfolio.cash }}</div>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -20,6 +21,7 @@
                     <th scope="col">Код</th>
                     <th scope="col">Брой</th>
                     <th scope="col">Цена</th>
+                    <th scope="col"></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -29,40 +31,45 @@
                         <td>{{ position.ticker.symbol }}</td>
                         <td>{{ position.count }}</td>
                         <td>{{ position.avg_price }}</td>
+                        <td><a href="{% url 'position_add' pk=position.pk %}">Buy</a> | <a href="{% url 'position_sell' pk=position.pk %}">Sell</a></td>
                     </tr>
                 {% endfor %}
                 <tr>
                     <th scope="row"></th>
-                    <td colspan="2"></td>
+                    <td colspan="3"></td>
+
                     <td>LINKS</td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <hr>
-    <div id="portfolio-container" class="portfolio accordion">
-        <div class="portfolio-header">
-            <div class="portfolio-cell">Ticker</div>
-            <div class="portfolio-cell">shares count</div>
-            <div class="portfolio-cell">price per share</div>
-            <div class="portfolio-cell">total invested</div>
-            <div class="portfolio-cell">current price</div>
-            <div class="portfolio-cell">change</div>
-            <div class="portfolio-cell">gain / loss</div>
-            <div class="portfolio-cell"></div>
-        </div>
-        <div id="loader">
-            <div class="loader">
-                <div class="justify-content-center jimu-primary-loading"></div>
-            </div>
-        </div>
-    </div>
-    <div class="portfolio-bottom">
-        <a class="action action-delete" href="">Delete portfolio</a>
-        <a id="toggle-link" class="action action-cash">Cash operations</a>
 
-    </div>
+{##}
+{#    <hr>#}
+{#    <div id="portfolio-container" class="portfolio accordion">#}
+{#        <div class="portfolio-header">#}
+{#            <div class="portfolio-cell">Ticker</div>#}
+{#            <div class="portfolio-cell">shares count</div>#}
+{#            <div class="portfolio-cell">price per share</div>#}
+{#            <div class="portfolio-cell">total invested</div>#}
+{#            <div class="portfolio-cell">current price</div>#}
+{#            <div class="portfolio-cell">change</div>#}
+{#            <div class="portfolio-cell">gain / loss</div>#}
+{#            <div class="portfolio-cell"></div>#}
+{#        </div>#}
+{#        <div id="loader">#}
+{#            <div class="loader">#}
+{#                <div class="justify-content-center jimu-primary-loading"></div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="portfolio-bottom">#}
+{#        <a class="action action-delete" href="">Delete portfolio</a>#}
+{#        <a id="toggle-link" class="action action-cash">Cash operations</a>#}
+{#    </div>#}
+
+
     <hr>
     <div>
         <form action="{% url 'portfolio_cash' pk=portfolio.pk %}" method="post">

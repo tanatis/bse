@@ -1,33 +1,16 @@
-from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 
 from bse.portfolio.models import Portfolio
-from bse.positions.forms import AddSellPositionForm
-from bse.positions.models import Position
+from bse.positions.forms import AddSellPositionForm, CreatePositionForm
+from bse.positions.models import Position, PositionHistory
 from bse.tickers.models import Ticker
 
 
-class CreatePositionForm(forms.ModelForm):
-    class Meta:
-        model = Position
-        fields = ('count', 'price', 'to_portfolio')
-
-    user = None  # Add a user field
-
-    def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)  # Remove user from kwargs and store it
-        super().__init__(*args, **kwargs)
-
-        if user:
-            self.user = user
-            self.fields['to_portfolio'].queryset = Portfolio.objects.filter(user=user)
-
-
-def is_portfolio_user(user, portfolio):
-    return user == portfolio.user
+# def is_portfolio_user(user, portfolio):
+#     return user == portfolio.user
 
 
 @login_required(login_url='user_login')
@@ -45,6 +28,7 @@ def create_position(request, symbol):
         if form.is_valid():
             count = form.cleaned_data['count']
             price = form.cleaned_data['price']
+            date = form.cleaned_data['date_added']
             portfolio_id = form.cleaned_data['to_portfolio'].id
             portfolio = Portfolio.objects.get(pk=portfolio_id)
             if portfolio.cash < count * price:
@@ -58,6 +42,15 @@ def create_position(request, symbol):
                 existing_position.price += count * price
                 existing_position.avg_price = existing_position.price / existing_position.count
                 existing_position.save()
+
+                position_history = PositionHistory(
+                    to_position=existing_position,
+                    count=count,
+                    price_per_share=price,
+                    date_added=date
+                )
+                position_history.save()
+
             else:
                 # Create a new position
                 position = Position(
@@ -66,8 +59,18 @@ def create_position(request, symbol):
                     price=price * count,
                     to_portfolio_id=portfolio_id,
                     avg_price=price,
+                    date_added=date
                 )
                 position.save()
+
+                position_history = PositionHistory(
+                    to_position=position,
+                    count=count,
+                    price_per_share=price,
+                    date_added=position.date_added
+                )
+                position_history.save()
+
             portfolio.cash -= count * price
             portfolio.save()
             return redirect('portfolio_details', pk=portfolio.pk)
@@ -97,6 +100,7 @@ def add_to_position(request, pk):
         if form.is_valid():
             price_per_share = form.cleaned_data['price']
             count = form.cleaned_data['count']
+            date = form.cleaned_data['date_added']
             if count * price_per_share > portfolio.cash:
                 messages.error(request, "Not enough cash to complete the operation")
                 return redirect('portfolio_details', pk=portfolio.pk)
@@ -105,6 +109,9 @@ def add_to_position(request, pk):
             position.price += count * price_per_share
             position.avg_price = position.price / position.count
             position.save()
+
+            position_history = PositionHistory(to_position=position, date_added=date, count=count, price_per_share=price_per_share)
+            position_history.save()
 
             portfolio.cash -= count * price_per_share
             portfolio.save()
@@ -134,6 +141,7 @@ def sell_position(request, pk):
         if form.is_valid():
             count = form.cleaned_data['count']
             price_per_share = form.cleaned_data['price']
+            date = form.cleaned_data['date_added']
             if count > position.count:
                 messages.error(request, f"You cannot sell more than {position.count} shares")
                 return redirect('portfolio_details', pk=portfolio.pk)
@@ -143,6 +151,10 @@ def sell_position(request, pk):
                 position.count -= count
                 position.price -= count * position.avg_price
                 position.save()
+
+                position_history = PositionHistory(to_position=position, date_added=date, count=-count,
+                                                   price_per_share=price_per_share)
+                position_history.save()
 
             portfolio.cash += count * price_per_share
             portfolio.save()
