@@ -2,6 +2,8 @@
 .form-register {max-width: 300px;}
 .form-floating {margin-bottom: 1rem;}
 
+main {flex-grow: 1; width: 80%; margin: 0 auto;}
+
 .portfolio {display: flex; flex-direction: column; width: 80%; margin:0 auto;}
 .portfolio-header {background-color: #076fe5; color: #e1ecf4;}
 .portfolio-header,
@@ -10,3 +12,13 @@
 .portfolio-cell {width: 150px; text-align: center;}
 .portfolio-cell a {text-decoration: none; color: #076fe5;}
 .portfolio-bottom {width: 80%; margin: 0 auto; display: flex; justify-content: end; gap: 2rem; padding: 1rem 5rem 0 0;}
+
+.accordion {margin: 0 auto;}
+.accordion-toggle {cursor: pointer; margin: 0; position: relative;}
+.accordion-toggle.active:after {content:url('../images/up.png'); position:absolute; left:5px; top:17px; width:0; height:0;}
+.accordion-toggle:before {content:url('../images/down.png'); position:absolute; left:5px; top:17px; width:0; height:0;}
+.accordion-toggle.active:before {display:none;}
+.accordion-content {display: none;}
+.accordion-toggle.active {background-color: #d4e6f2;}
+.accordion-content .portfolio-row {background-color: #d4e6f2; padding: 0.3rem 0; font-size: 0.85rem;}
+.accordion-content .portfolio-row:hover {color: #076fe5;}
